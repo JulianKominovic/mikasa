@@ -42280,22 +42280,61 @@ function requireServeStatic () {
 var express = /*@__PURE__*/getDefaultExportFromCjs(express$2.exports);
 
 const router$1 = express.Router();
-const systemController = () => {
-    router$1.get("/");
+const streamingController = () => {
+    router$1.get("/", (req, res) => {
+        console.log("location");
+        const { location } = req.query;
+        console.log(location);
+        if (!location) {
+            res.status(500).send("no hay path");
+        }
+        else {
+            const path = require$$0__default["default"].resolve("/home/julian", "Downloads", location);
+            const stat = require$$1__default$1["default"].statSync(path);
+            const fileSize = stat.size;
+            const range = req.headers.range;
+            if (range) {
+                const parts = range.replace(/bytes=/, "").split("-");
+                const start = parseInt(parts[0], 10);
+                const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+                const chunksize = end - start + 1;
+                const file = require$$1__default$1["default"].createReadStream(path, { start, end });
+                const head = {
+                    "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+                    "Accept-Ranges": "bytes",
+                    "Content-Length": chunksize,
+                    "Content-Type": "video/mp4",
+                };
+                res.writeHead(206, head);
+                file.pipe(res);
+            }
+            else {
+                const head = {
+                    "Content-Length": fileSize,
+                    "Content-Type": "video/mp4",
+                };
+                res.writeHead(200, head);
+                require$$1__default$1["default"].createReadStream(path).pipe(res);
+            }
+        }
+    });
     return router$1;
 };
 
 const router = express.Router();
 const routes = () => {
-    router.use("system", systemController());
+    router.use("/streaming", streamingController());
     return router;
 };
 
 const app = express();
 const port = 3000;
 const host = "localhost";
-app.use(express.static(require$$0__default["default"].resolve(__dirname, "../static")));
+const __filename$1 = require$$0$7.fileURLToPath((typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('index.js', document.baseURI).href)));
+const __dirname$1 = require$$0__default["default"].dirname(__filename$1);
+console.log("HOLA");
 app.use(routes());
+app.use(express.static(require$$0__default["default"].resolve(__dirname$1, "../static")));
 app.listen(process.env.PORT || port, process.env.HOST || host, () => {
     console.log(`Example app listening on port ${port}`);
 });

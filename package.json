@@ -2,7 +2,7 @@
   "name": "mikasa",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.ts",
+  "type": "module",
   "scripts": {
     "build": "rollup --config",
     "dev": "nodemon ./src/index.ts",

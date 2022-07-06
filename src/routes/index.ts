@@ -1,8 +1,9 @@
 import express, { Request, Response } from "express";
-import systemController from "../controllers/system";
+import streamingController from "../controllers/streaming";
+
 const router = express.Router();
 const routes = () => {
-  router.use("system", systemController());
+  router.use("/streaming", streamingController());
 
   return router;
 };
