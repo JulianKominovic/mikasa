@@ -1,7 +1,7 @@
 {
   "theme_color": "#000",
   "background_color": "#FFE922",
-  "display": "browser",
+  "display": "fullscreen",
   "scope": "/",
   "start_url": "/",
   "name": "Mikasa | Home",
